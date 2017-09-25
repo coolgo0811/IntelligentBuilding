@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MQTTSetting>
+  <SSMQTunnel>
+    <LGID>LG0001</LGID>
+    <SSID>SA-EGS</SSID>
+    <PrimeLG>LG0001</PrimeLG>
+    <MQPIPPT>127.0.0.1:1883</MQPIPPT>
+    <MQSIPPT></MQSIPPT>
+  </SSMQTunnel>
+  <MQID>ICMP</MQID>
+  <LGSSID>PMS10002001LG0001SA-EGS</LGSSID>
+</MQTTSetting>
