@@ -12,13 +12,13 @@ var app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-app.all('/', function (req, res, next) {
+app.all('/', (req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Headers', 'X-Requested-With');
   next();
 });
 
-app.post('/alarm', function (req, res) {
+app.post('/alarm', (req, res) => {
   try {
     console.log(req.body);
     mqttServices.alarmNotify(req.body);
@@ -28,7 +28,7 @@ app.post('/alarm', function (req, res) {
   }
 });
 
-app.post('/equip/status', function (req, res) {
+app.post('/equip/status', (req, res) => {
   try {
     console.log(req.body);
     mqttServices.equipStatusChange(req.body);
@@ -38,6 +38,6 @@ app.post('/equip/status', function (req, res) {
   }
 });
 
-app.listen(3000, function () {
+app.listen(3000, () => {
   console.log('app listening on port 3000!');
 });

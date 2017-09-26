@@ -59,23 +59,24 @@ class MQTTClient {
       this.events.emit('reconnect');
     });
 
-    this.client.on('message', function (topic, message) {
-      let buff = topic.split('/');
+    this.client.on('message', (topic, message) => {
+      var buff = topic.split('/');
       if (buff.length < 2) {
         return;
       }
+      var msg = JSON.parse(message.toString());
       switch (buff[1]) {
         case 'A02_CheckAliveRequest':
-          this.events.emit('checkAlive', topic, message);
+          this.events.emit('checkAlive', topic, msg);
           break;
         case 'A10b_IsAlertedRequest':
-          this.events.emit('isAlerted', topic, message);
+          this.events.emit('isAlerted', topic, msg);
           break;
         case 'A10a_AlertedReportRequest':
-          this.events.emit('alertedReportRequest', topic, message);
+          this.events.emit('alertedReportRequest', topic, msg);
           break;
         case 'A41a_EquipStatusRequest':
-          this.events.emit('equipStatusRequest', topic, message);
+          this.events.emit('equipStatusRequest', topic, msg);
           break;
       }
     });
@@ -93,13 +94,10 @@ class MQTTClient {
 
   publish (topic, message, options, callback) {
     try {
-      let msg = null;
+      var msg = null;
       if (typeof message === 'string') {
         msg = message;
       } else {
-        if (message.hasOwnProperty('ts') === false) {
-          message.ts = new Date();
-        }
         msg = JSON.stringify(message);
       }
       this.client.publish(topic, msg, options, callback);
