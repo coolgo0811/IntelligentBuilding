@@ -12,15 +12,16 @@ var connStatus = {
 };
 
 class MQTTClient {
-  constructor (conf) {
-    this.conf = conf;
+  constructor () {
+    this.conf = null;
     this.clientId = 'app_' + Math.random().toString(16).substr(2, 8);
     this.client = null;
     this.events = new EventEmitter();
     this.connectStatus = connStatus.None;
   }
 
-  connect () {
+  connect (conf) {
+    this.conf = conf;
     this.connectStatus = connStatus.Connecting;
 
     var tcpOptions = {

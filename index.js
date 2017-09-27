@@ -38,6 +38,16 @@ app.post('/equip/status', (req, res) => {
   }
 });
 
+app.post('/reconnect', (req, res) => {
+  try {
+    console.log(req.body);
+    mqttServices.reconnectMQTTBroker(req.body);
+    res.sendStatus(200);
+  } catch (ex) {
+    res.sendStatus(500);
+  }
+});
+
 app.listen(3000, () => {
   console.log('app listening on port 3000!');
 });

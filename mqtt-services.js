@@ -8,12 +8,7 @@ var MQTTClient = require('./mqtt-client');
 var topics = require('./topics');
 var setting = require('./setting');
 
-var conf = {
-  host: setting.SSMQTunnel.MQPIPPT.split(':')[0],
-  port: setting.SSMQTunnel.MQPIPPT.split(':')[1]
-};
-
-var mqttClient = new MQTTClient(conf);
+var mqttClient = new MQTTClient();
 
 /* EqMdle: "10.144.18.10",
 EqType: "2",
@@ -21,9 +16,7 @@ EqID: "0008001001201",
 EqAttrType: "DO",
 EqAttr: "00000000",
 IsAlerted: true,
-Alarm:{
-
-},
+Alarm:{},
 EqStatus: 0" */
 
 var equipList = [];
@@ -48,6 +41,19 @@ function _keepAlive () {
     });
 
   setTimeout(_keepAlive, 1000 * 60);
+}
+
+function reconnectMQTTBroker (body) {
+  try {
+    var conf = {
+      host: body.MQTunnel.split(':')[0],
+      port: body.MQTunnel.split(':')[1]
+    };
+    mqttClient.close();
+    mqttClient.connect(conf);
+  } catch (ex) {
+    console.error('[reconnectMQTTBroker] ' + ex);
+  }
 }
 
 function alarmNotify (body) {
@@ -122,7 +128,11 @@ function equipStatusChange (body) {
   }
 }
 
-mqttClient.connect();
+var conf = {
+  host: setting.SSMQTunnel.MQPIPPT.split(':')[0],
+  port: setting.SSMQTunnel.MQPIPPT.split(':')[1]
+};
+mqttClient.connect(conf);
 mqttClient.events.on('connect', () => {
   console.log('[mqtt] Connect success !');
 
@@ -142,6 +152,37 @@ mqttClient.events.on('connect', () => {
           return console.error(err);
         }
         console.log('register success !');
+
+        if (equipList) {
+          for (var i = 0; i < equipList.length; i++) {
+            var equip = equipList[i];
+            var statusTopic = util.format(topics.equipStatusReport, equip.EqMdle, equip.EqType,
+              equip.EqID, equip.EqAttrType, equip.EqAttr);
+            mqttClient.publish(statusTopic, {
+              Atime: moment().format('YYYY-MM-DD HH:mm:ss'),
+              EqStatus: equip.EqStatus
+            }, { qos: 0, retain: true }, (err) => {
+              if (err) {
+                console.error(err);
+              } else {
+                console.log('equip status report send success !');
+              }
+            });
+
+            if (equip.IsAlerted) {
+              var alarmTopic = util.format(topics.alarmReport, equip.EqMdle, equip.EqType, equip.EqID,
+                equip.EqAttrType, equip.EqAttr);
+              equip.Alarm.Atime = moment().format('YYYY-MM-DD HH:mm:ss');
+              mqttClient.publish(alarmTopic, equip.Alarm, { qos: 0, retain: true }, (err) => {
+                if (err) {
+                  console.error(err);
+                } else {
+                  console.log('alarm report send success !');
+                }
+              });
+            }
+          }
+        }
       }
     );
     // keep alive
@@ -313,5 +354,6 @@ mqttClient.events.on('equipStatusRequest', (topic, message) => {
 });
 module.exports = {
   alarmNotify: alarmNotify,
-  equipStatusChange: equipStatusChange
+  equipStatusChange: equipStatusChange,
+  reconnectMQTTBroker: reconnectMQTTBroker
 };
