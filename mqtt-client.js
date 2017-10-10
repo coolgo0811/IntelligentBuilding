@@ -68,15 +68,19 @@ class MQTTClient {
       var msg = JSON.parse(message.toString());
       switch (buff[1]) {
         case 'A02_CheckAliveRequest':
+          console.log('[A02_CheckAliveRequest]:');
           this.events.emit('checkAlive', topic, msg);
           break;
         case 'A10b_IsAlertedRequest':
+          console.log('[A10b_IsAlertedRequest]');
           this.events.emit('isAlerted', topic, msg);
           break;
         case 'A10a_AlertedReportRequest':
+          console.log('[A10a_AlertedReportRequest]');
           this.events.emit('alertedReportRequest', topic, msg);
           break;
         case 'A41a_EquipStatusRequest':
+          console.log('[A41a_EquipStatusRequest]');
           this.events.emit('equipStatusRequest', topic, msg);
           break;
       }

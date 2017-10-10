@@ -18,7 +18,7 @@ app.all('/', (req, res, next) => {
 
 app.post('/alarm', (req, res) => {
   try {
-    console.log(req.body);
+    console.log(JSON.stringify(req.body));
     let equipInfo = req.body.EquipInfo;
     let alarmInfo = req.body.AlarmInfo;
     if (!equipInfo || !alarmInfo) {
@@ -43,7 +43,7 @@ app.post('/alarm', (req, res) => {
 
 app.post('/equip/status', (req, res) => {
   try {
-    console.log(req.body);
+    console.log(JSON.stringify(req.body));
     let equipInfo = req.body.EquipInfo;
     let statusInfo = req.body.StatusInfo;
     if (!equipInfo || !statusInfo) {
@@ -67,7 +67,7 @@ app.post('/equip/status', (req, res) => {
 
 app.post('/reconnect', (req, res) => {
   try {
-    console.log(req.body);
+    console.log(JSON.stringify(req.body));
     mqttServices.reconnectMQTTBroker(req.body);
     res.sendStatus(200);
   } catch (ex) {

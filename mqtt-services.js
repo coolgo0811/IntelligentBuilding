@@ -81,6 +81,7 @@ function alarmNotify (body) {
 
     var topic = util.format(topics.alarmReport, equipInfo.EqMdle, equipInfo.EqType, equipInfo.EqID,
       equipInfo.EqAttrType, equipInfo.EqAttr);
+    console.log(util.format('publish to [%s] topic, msg = %s', topic, JSON.stringify(alarmInfo)));
     mqttClient.publish(topic, alarmInfo, { qos: 0, retain: true }, (err) => {
       if (err) {
         console.error(err);
@@ -116,6 +117,7 @@ function equipStatusChange (body) {
     }
     var topic = util.format(topics.equipStatusReport, equipInfo.EqMdle, equipInfo.EqType, equipInfo.EqID,
       equipInfo.EqAttrType, equipInfo.EqAttr);
+    console.log(util.format('publish to [%s] topic, msg = %s', topic, JSON.stringify(statusInfo)));
     mqttClient.publish(topic, statusInfo, { qos: 0, retain: true }, (err) => {
       if (err) {
         console.error(err);
@@ -158,10 +160,12 @@ mqttClient.events.on('connect', () => {
             var equip = equipList[i];
             var statusTopic = util.format(topics.equipStatusReport, equip.EqMdle, equip.EqType,
               equip.EqID, equip.EqAttrType, equip.EqAttr);
-            mqttClient.publish(statusTopic, {
+            var msg = {
               Atime: moment().format('YYYY-MM-DD HH:mm:ss'),
               EqStatus: equip.EqStatus
-            }, { qos: 0, retain: true }, (err) => {
+            };
+            console.log(util.format('publish to [%s] topic, msg = %s', statusTopic, JSON.stringify(msg)));
+            mqttClient.publish(statusTopic, msg, { qos: 0, retain: true }, (err) => {
               if (err) {
                 console.error(err);
               } else {
@@ -173,6 +177,7 @@ mqttClient.events.on('connect', () => {
               var alarmTopic = util.format(topics.alarmReport, equip.EqMdle, equip.EqType, equip.EqID,
                 equip.EqAttrType, equip.EqAttr);
               equip.Alarm.Atime = moment().format('YYYY-MM-DD HH:mm:ss');
+              console.log(util.format('publish to [%s] topic, msg = %s', alarmTopic, JSON.stringify(equip.Alarm)));
               mqttClient.publish(alarmTopic, equip.Alarm, { qos: 0, retain: true }, (err) => {
                 if (err) {
                   console.error(err);
@@ -247,6 +252,7 @@ mqttClient.events.on('isAlerted', (topic, message) => {
       reply.AlarmID = equip.Alarm.AlarmID;
     }
     var replyTopic = util.format(topics.isAlertedReply, EqMdle, EqType, EqID, EqAttrType, EqAttr);
+    console.log(util.format('publish to [%s] topic, msg = %s', replyTopic, JSON.stringify(reply)));
     mqttClient.publish(replyTopic, reply, { qos: 0, retain: false },
         (err) => {
           if (err) {
@@ -280,6 +286,7 @@ mqttClient.events.on('alertedReportRequest', (topic, message) => {
     if (equip) {
       equip.Alarm.Atime = moment().format('YYYY-MM-DD HH:mm:ss');
       var sendTopic = util.format(topics.alarmReport, EqMdle, EqType, EqID, EqAttrType, EqAttr);
+      console.log(util.format('publish to [%s] topic, msg = %s', sendTopic, JSON.stringify(equip.Alarm)));
       mqttClient.publish(sendTopic, equip.Alarm, { qos: 0, retain: true }, (err) => {
         if (err) {
           console.error(err);
@@ -292,7 +299,9 @@ mqttClient.events.on('alertedReportRequest', (topic, message) => {
     }
 
     var replyTopic = util.format(topics.alertedReportReply, EqMdle, EqType, EqID, EqAttrType, EqAttr);
-    mqttClient.publish(replyTopic, { Atime: Atime, A10Rst: A10Rst }, { qos: 0, retain: false },
+    var msg = { Atime: Atime, A10Rst: A10Rst };
+    console.log(util.format('publish to [%s] topic, msg = %s', replyTopic, JSON.stringify(msg)));
+    mqttClient.publish(replyTopic, msg, { qos: 0, retain: false },
       (err) => {
         if (err) {
           return console.error(err);
@@ -325,10 +334,12 @@ mqttClient.events.on('equipStatusRequest', (topic, message) => {
     var A41Rst = '0';
     if (equip) {
       var sendTopic = util.format(topics.equipStatusReport, EqMdle, EqType, EqID, EqAttrType, EqAttr);
-      mqttClient.publish(sendTopic, {
+      var sendMsg = {
         Atime: moment().format('YYYY-MM-DD HH:mm:ss'),
         EqStatus: equip.EqStatus
-      }, { qos: 0, retain: true }, (err) => {
+      };
+      console.log(util.format('publish to [%s] topic, msg = %s', sendTopic, JSON.stringify(sendMsg)));
+      mqttClient.publish(sendTopic, sendMsg, { qos: 0, retain: true }, (err) => {
         if (err) {
           console.error(err);
         } else {
@@ -340,7 +351,9 @@ mqttClient.events.on('equipStatusRequest', (topic, message) => {
     }
 
     var replyTopic = util.format(topics.equipStatusReply, EqMdle, EqType, EqID, EqAttrType, EqAttr);
-    mqttClient.publish(replyTopic, { Atime: Atime, A41Rst: A41Rst }, { qos: 0, retain: false },
+    var replyMsg = { Atime: Atime, A41Rst: A41Rst };
+    console.log(util.format('publish to [%s] topic, msg = %s', replyTopic, JSON.stringify(replyMsg)));
+    mqttClient.publish(replyTopic, replyMsg, { qos: 0, retain: false },
       (err) => {
         if (err) {
           return console.error(err);
