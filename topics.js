@@ -11,7 +11,7 @@ var LGSSID = setting.LGSSID;
 
 // publish
 var register = util.format('%s/A00_Register/%s/%s', MQID, MQTunnel, SSID);
-var keepAlive = util.format('%s/A01_keepAlive/%s/%s', MQID, MQTunnel, SSID);
+var keepAlive = util.format('%s/A01_KeepAlive/%s/%s', MQID, MQTunnel, SSID);
 var checkAliveReply = util.format('%s/A02_CheckAliveReply/%s/%s', MQID, MQTunnel, SSID);
 var alarmReport = util.format('%s/A10_AlarmReport/%s/%s/%s/%s/%s/%s/%s', MQID, MQTunnel, LGSSID);
 var equipStatusReport = util.format('%s/A41_EquipStatusReport/%s/%s/%s/%s/%s/%s/%s', MQID, MQTunnel, LGSSID);

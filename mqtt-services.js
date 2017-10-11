@@ -36,7 +36,7 @@ function _keepAlive () {
       if (err) {
         console.error(err);
       } else {
-        // console.log('keep alive success !');
+        console.log('keep alive success !');
       }
     });
 
